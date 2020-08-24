@@ -105,7 +105,7 @@ var DelayGenerator = /** @class */ (function (_super) {
                         _a.sent();
                         renderMsg = [
                             fluid.audiotrack.select('melody-podo'),
-                            fluid.audiotrack.renderRegion(path_1.default.join(__dirname, 'data', "mel_" + v.decay + "_" + v.predelay + "_" + v.size + "_" + v.damping + "_" + v.bandwidth + "_" + v.density + "_" + v.mix + "_" + v.earlylatemix + "_.wav"), 0, 8),
+                            fluid.audiotrack.renderRegion(path_1.default.join(__dirname, 'data', "mel_" + v.delay + "_" + v.feedback + "_" + this.batchNum + "_.wav"), 0, 8),
                         ];
                         return [4 /*yield*/, renderClient.send(renderMsg).then(function () {
                                 _this.completed++;
@@ -121,8 +121,8 @@ var DelayGenerator = /** @class */ (function (_super) {
     return DelayGenerator;
 }(gen_base_1.Generator));
 var params = [
-    { param: 'delay', min: 0, max: 2000, numQueries: 200 },
-    { param: 'feedback', min: -1, max: 1, numQueries: 0.25 },
+    { param: 'delay', min: 0, max: 2000, numQueries: 10 },
+    { param: 'feedback', min: -1, max: 1, numQueries: 10 },
 ];
-var gen = new DelayGenerator(params, 1);
+var gen = new DelayGenerator(params, 2);
 gen.generate();

@@ -111,7 +111,7 @@ var ReverbGenerator = /** @class */ (function (_super) {
                         _a.sent();
                         renderMsg = [
                             fluid.audiotrack.select('melody-podo'),
-                            fluid.audiotrack.renderRegion(path_1.default.join(__dirname, 'data', "mel_" + v.decay + "_" + v.predelay + "_" + v.size + "_" + v.damping + "_" + v.bandwidth + "_" + v.density + "_" + v.mix + "_" + v.earlylatemix + "_.wav"), 0, 8),
+                            fluid.audiotrack.renderRegion(path_1.default.join(__dirname, 'data', "mel_" + v.decay + "_" + v.predelay + "_" + v.size + "_" + v.damping + "_" + v.bandwidth + "_" + v.density + "_" + v.mix + "_" + v.earlylatemix + "_" + this.batchNum + "_.wav"), 0, 8),
                         ];
                         return [4 /*yield*/, renderClient.send(renderMsg).then(function () {
                                 _this.completed++;
@@ -136,5 +136,5 @@ var params = [
     { param: 'mix', min: 0, max: 100, numQueries: 2 },
     { param: 'earlylatemix', min: 0, max: 100, numQueries: 2 },
 ];
-var gen = new ReverbGenerator(params, 1);
+var gen = new ReverbGenerator(params, 2);
 gen.generate();

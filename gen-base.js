@@ -41,7 +41,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Generator = void 0;
 var model_1 = __importDefault(require("./model"));
+/**
+ * Base class for generating random audio samples with a range of plugin parameters.
+ */
 var Generator = /** @class */ (function () {
+    /**
+     * @param {fType.paramArray} params An array of objects that look like:
+     *       { param: string, min: number, max: number, numQueries: number}
+     * @param {number} batches The number of batches we should generate
+     * @param {fType.clientOptions} options Options object for a FluidIpcClient.
+     */
     function Generator(params, batches, options) {
         this.params = params;
         this.batches = batches;
@@ -49,6 +58,7 @@ var Generator = /** @class */ (function () {
         this.samples = [];
         this.sampleNum = 0;
         this.completed = 0;
+        this.batchNum = 0;
         this.clientOptions = {
             targetPort: 9999,
             targetHost: '127.0.0.1',
@@ -56,11 +66,14 @@ var Generator = /** @class */ (function () {
             timeout: 30000000,
             isUnixDomainSocket: false,
         };
-        this.getInterval = function (min, max, num) { return (max - min) / (num - 1); };
         this.model = new model_1.default();
         if (options)
             this.clientOptions = options;
     }
+    /**
+     * Generates `batches * (param.numQueries for each parameter)` random 4 bar melodies using the
+     * magenta.js library, and converts them into noteArrays that can be read by the Fluid Engine
+     */
     Generator.prototype.getSamples = function () {
         return __awaiter(this, void 0, void 0, function () {
             var numOfSamples, _i, _a, param, outputMel, samples, _b, outputMel_1, sample, notes;
@@ -92,39 +105,14 @@ var Generator = /** @class */ (function () {
             });
         });
     };
-    Generator.prototype.recurHelper = function (curr, values) {
-        return __awaiter(this, void 0, void 0, function () {
-            var i;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!(curr === Object.entries(this.params).length)) return [3 /*break*/, 2];
-                        return [4 /*yield*/, this.send(values, this.samples[this.sampleNum])];
-                    case 1:
-                        _a.sent();
-                        this.sampleNum++;
-                        return [3 /*break*/, 6];
-                    case 2:
-                        i = this.params[curr].min;
-                        _a.label = 3;
-                    case 3:
-                        if (!(i <= this.params[curr].max)) return [3 /*break*/, 6];
-                        values[this.params[curr].param] = i;
-                        return [4 /*yield*/, this.recurHelper(curr + 1, values)];
-                    case 4:
-                        _a.sent();
-                        _a.label = 5;
-                    case 5:
-                        i += this.getInterval(this.params[curr].min, this.params[curr].max, this.params[curr].numQueries);
-                        return [3 /*break*/, 3];
-                    case 6: return [2 /*return*/];
-                }
-            });
-        });
-    };
+    /**
+     * `generate` calls `send` with every combination of values parameters can be set to,
+     * `batches` times
+     */
     Generator.prototype.generate = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _a, iter;
+            var _a, getInterval, recurHelper, iter;
+            var _this = this;
             return __generator(this, function (_b) {
                 switch (_b.label) {
                     case 0:
@@ -133,12 +121,46 @@ var Generator = /** @class */ (function () {
                     case 1:
                         _a.samples = _b.sent();
                         this.completed = 0;
+                        this.batchNum = 0;
+                        getInterval = function (min, max, num) {
+                            if (num === 1)
+                                return 0;
+                            return (max - min) / (num - 1);
+                        };
+                        recurHelper = function (curr, values) { return __awaiter(_this, void 0, void 0, function () {
+                            var i;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0:
+                                        if (!(curr === Object.entries(this.params).length)) return [3 /*break*/, 2];
+                                        return [4 /*yield*/, this.send(values, this.samples[this.sampleNum])];
+                                    case 1:
+                                        _a.sent();
+                                        this.sampleNum++;
+                                        return [3 /*break*/, 6];
+                                    case 2:
+                                        i = this.params[curr].min;
+                                        _a.label = 3;
+                                    case 3:
+                                        if (!(i <= this.params[curr].max)) return [3 /*break*/, 6];
+                                        values[this.params[curr].param] = i;
+                                        return [4 /*yield*/, recurHelper(curr + 1, values)];
+                                    case 4:
+                                        _a.sent();
+                                        _a.label = 5;
+                                    case 5:
+                                        i += getInterval(this.params[curr].min, this.params[curr].max, this.params[curr].numQueries);
+                                        return [3 /*break*/, 3];
+                                    case 6: return [2 /*return*/];
+                                }
+                            });
+                        }); };
                         iter = 0;
                         _b.label = 2;
                     case 2:
                         if (!(iter < this.batches)) return [3 /*break*/, 5];
                         console.log('Sending batch:', iter);
-                        return [4 /*yield*/, this.recurHelper(0, {})];
+                        return [4 /*yield*/, recurHelper(0, {})];
                     case 3:
                         _b.sent();
                         _b.label = 4;

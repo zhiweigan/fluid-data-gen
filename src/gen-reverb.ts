@@ -9,7 +9,7 @@ const getRandom  = (min = 0, max = 1) => Math.random() * (max - min) + min;
 class ReverbGenerator extends Generator {
 
   async send(v: any, sample: fType.noteArray): Promise<void> {
-    
+
     let client = new fluid.Client(this.clientOptions);
     let renderClient = new fluid.Client(this.clientOptions);
 
@@ -56,7 +56,7 @@ class ReverbGenerator extends Generator {
       path.join(
         __dirname, 
         'data', 
-        `mel_${v.decay}_${v.predelay}_${v.size}_${v.damping}_${v.bandwidth}_${v.density}_${v.mix}_${v.earlylatemix}_.wav`
+        `mel_${v.decay}_${v.predelay}_${v.size}_${v.damping}_${v.bandwidth}_${v.density}_${v.mix}_${v.earlylatemix}_${this.batchNum}_.wav`
       ), 0, 8),
     ];
 
@@ -79,5 +79,5 @@ const params = [
   {param: 'earlylatemix', min: 0, max: 100, numQueries: 2 },
 ]
 
-let gen = new ReverbGenerator(params, 1);
+let gen = new ReverbGenerator(params, 2);
 gen.generate();

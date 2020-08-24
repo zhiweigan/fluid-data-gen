@@ -50,7 +50,7 @@ class DelayGenerator extends Generator {
       path.join(
         __dirname, 
         'data', 
-        `mel_${v.decay}_${v.predelay}_${v.size}_${v.damping}_${v.bandwidth}_${v.density}_${v.mix}_${v.earlylatemix}_.wav`
+        `mel_${v.delay}_${v.feedback}_${this.batchNum}_.wav`
       ), 0, 8),
     ];
 
@@ -67,5 +67,5 @@ const params = [
   {param: 'feedback', min: -1, max: 1, numQueries: 10 },
 ]
 
-let gen = new DelayGenerator(params, 1);
+let gen = new DelayGenerator(params, 2);
 gen.generate();
