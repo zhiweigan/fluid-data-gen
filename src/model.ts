@@ -5,10 +5,10 @@ export default class FluidModel {
   model: any;
 
   constructor(){
-		// const drumUrl = 'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/drums_4bar_med_lokl_q2'
     // const melodyUrl = 'https://storage.googleapis.com/magentadata/js/checkpoints/music_vae/mel_4bar_med_lokl_q2'
 
-    // Download from the URL's using checkpoint_downloader, npm i --global http-server, then run http server in the folder's root directory.
+    // Download from the URL's using checkpoint_downloader, npm i --global http-server, 
+    // then run the command http-server in the folder's root directory.
     const melodyUrl = 'http://localhost:8080/mel'
 
     this.model = new mvae.MusicVAE(melodyUrl)
